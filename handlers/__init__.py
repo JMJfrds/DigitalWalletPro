@@ -1,5 +1,5 @@
 from aiogram import Dispatcher
-from bot.handlers import start
+from handlers import start
 
 
 def register_all_handlers(dp: Dispatcher):
