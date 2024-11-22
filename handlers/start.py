@@ -1,7 +1,8 @@
 from aiogram import Router
 from aiogram.types import Message
 from aiogram.filters import Command
-from models.user import User, add_user
+from models.user import User
+from services.user import add_user
 from config import BOT_USERNAME
 
 router = Router()
