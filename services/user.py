@@ -23,6 +23,6 @@ async def add_user(tg_id: int, full_name: str, username: str, referred_by_code: 
     await user.save()
 
 
-async def get_balance(tg_id: int):
+async def get_user(tg_id: int):
     user = await User.get_or_none(tg_id=tg_id)
-    await user.balance
+    return user

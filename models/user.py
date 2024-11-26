@@ -8,7 +8,7 @@ class User(Model):
     tg_id = fields.BigIntField(unique=True)
     full_name = fields.CharField(max_length=255, null=True)
     username = fields.CharField(max_length=255, unique=True)
-    balance = fields.IntField(default=0,null=True)
+    balance = fields.IntField(default=0, null=True)
     referral_code = fields.CharField(max_length=36, unique=True)
     referral_count = fields.IntField(default=0)
     referred_by = fields.ForeignKeyField("models.User", related_name="referrals", null=True)
@@ -24,6 +24,21 @@ class User(Model):
                 return referral_code
 
 
+class Transaction(Model):
+    id = fields.IntField(pk=True)
+    sender = fields.ForeignKeyField("models.User", related_name="sender_transactions", null=True)
+    receiver = fields.ForeignKeyField("models.User", related_name="receiver_transactions", null=True)
+    amount = fields.IntField(null=True)
+    timestamp = fields.DatetimeField(auto_now_add=True)
+    note = fields.CharField(max_length=255)
 
+    @classmethod
+    async def create_transaction(cls, sender: User, receiver: User, amount: int, note: str):
+        if sender.balance < amount:
+            raise ValueError("Sender does not have enough balance.")
+        sender.balance -= amount
+        receiver.balance += amount
+        await sender.save()
+        await receiver.save()
 
-
+        await cls.create(sender=sender, receiver=receiver, amount=amount, note=note)
