@@ -33,12 +33,12 @@ class Transaction(Model):
     note = fields.CharField(max_length=255)
 
     @classmethod
-    async def create_transaction(cls, sender: User, receiver: User, amount: int, note: str):
+    async def create_transaction(cls, sender: User, receiver: User, amount: int, note: str = None):
         if sender.balance < amount:
-            raise ValueError("Sender does not have enough balance.")
+            raise ValueError("sender balance must be greater than receiver balance")
         sender.balance -= amount
         receiver.balance += amount
         await sender.save()
         await receiver.save()
-
         await cls.create(sender=sender, receiver=receiver, amount=amount, note=note)
+

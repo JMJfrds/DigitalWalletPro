@@ -1,7 +1,8 @@
 from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
-from services.user import check_address
+from services.user import check_address, get_user
+from models.user import Transaction
 from utils.states import SendCoins
 
 router = Router()
@@ -22,5 +23,46 @@ async def get_address(message: Message, state: FSMContext):
         await message.answer("Enter the amount to send:")
         await state.set_state(SendCoins.amount)
     else:
-        await message.answer("Noto‘g‘ri referral address. Qayta kiriting.") # noqa
+        await message.answer("Noto‘g‘ri referral address. Qayta kiriting.")  # noqa
+
+
+@router.message(SendCoins.amount)
+async def get_amount(message: Message, state: FSMContext):
+    try:
+        amount = int(message.text)
+        if amount <= 0:
+            await message.answer("Miqdorni kritish da xatolik bor. Qayta kiriting.")  # noqa
+        await state.update_data(amount=amount)
+        await message.answer("Tranzaktsiya uchun izoh qo‘shing (ixtiyoriy):")  # noqa
+        await state.set_state(SendCoins.note)
+
+    except ValueError:
+        await message.answer("Noto‘g‘ri miqdor. Faqat son kiriting.")  # noqa
+
+
+@router.message(SendCoins.note)
+async def get_note(message: Message, state: FSMContext):
+    note = message.text
+    data = await state.get_data()
+    address = data['address']
+    addr = await check_address(address)
+    amount: int = int(data['amount'])
+    user = await get_user(message.from_user.id)
+
+    transaction = await Transaction.create_transaction(
+        sender=user,
+        receiver=addr,
+        amount=amount,
+        note=note or "Gift"
+    )
+
+    await message.answer(
+        f"Transaction successful!\n\n"
+        f"📤 From:  {user.referral_code}\n"
+        f"📍 To:    {address}\n"
+        f"🌕 Coin:  {amount}\n"
+        f"✏️ Note:  {note or "Gift"}"
+    )
+
+    await state.clear()
 
