@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from services.user import check_address, get_user
+from services.notif import send_notification
 from models.user import Transaction
 from utils.states import SendCoins
 
@@ -63,6 +64,15 @@ async def get_note(message: Message, state: FSMContext):
         f"🌕 Coin:  {amount}\n"
         f"✏️ Note:  {note or "Gift"}"
     )
+    caption = f""" 
+    🎉✨ Sizga yangi tangalar keldi! ✨🎉
 
+    💰 Yuborilgan tanga miqdori: 🌕 {amount} 
+    🤝 Yuboruvchi: 📤 {user.referral_code} 
+
+    💡 Tangalaringizni to'plang va imkoniyatlardan foydalaning! 🚀
+    """
+    img_url = "https://unsplash.com/photos/three-gold-bitcoins-sitting-on-top-of-a-wooden-table-qRRv6nQyNmk"
+
+    await send_notification(addr.tg_id, img_url, caption)
     await state.clear()
-
