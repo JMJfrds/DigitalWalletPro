@@ -1,6 +1,7 @@
 import asyncio
 from aiogram import Bot, Dispatcher
 from config import BOT_TOKEN
+
 from handlers import register_all_handlers
 from middlewares.logging_middeware import CustomLoggingMiddleware
 from tortoise import Tortoise
@@ -21,4 +22,3 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
-

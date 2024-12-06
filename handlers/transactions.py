@@ -74,5 +74,6 @@ async def get_note(message: Message, state: FSMContext):
     """
     img_url = "https://unsplash.com/photos/three-gold-bitcoins-sitting-on-top-of-a-wooden-table-qRRv6nQyNmk"
 
-    await send_notification(addr.tg_id, img_url, caption)
+    await send_notification(addr.tg_id,img_url,caption)
+
     await state.clear()
